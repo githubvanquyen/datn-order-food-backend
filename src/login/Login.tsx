@@ -14,8 +14,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-import { useAppDispatch} from "../redux/hooks";
-import {login} from "../redux/slide/loginSlide";
+import { useAppDispatch } from "../redux/hooks";
+import { login } from "../redux/reducers/loginSlide";
 
 const theme = createTheme();
 

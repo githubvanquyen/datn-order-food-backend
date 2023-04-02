@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useAppDispatch } from '../redux/hooks';
-import { register } from '../redux/slide/loginSlide';
+import { register } from '../redux/reducers/loginSlide';
 
 const theme = createTheme();
 

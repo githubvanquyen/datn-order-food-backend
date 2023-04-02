@@ -10,7 +10,8 @@ import {
     REGISTER,
   } from "redux-persist";
   import storage from "redux-persist/lib/storage";
-import loginReducer from "./slide/loginSlide"
+import loginReducer from "./reducers/loginSlide"
+import productReducer from "./reducers/producSlide";
 
 const persistConfig = {
     key: "root",
@@ -22,7 +23,8 @@ const persistConfig = {
 
 const store = configureStore({
     reducer:{
-        login: rootReducer
+        login: rootReducer,
+        product: productReducer
     },
     middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
