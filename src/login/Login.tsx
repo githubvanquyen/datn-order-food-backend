@@ -14,8 +14,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-import { useAppDispatch } from "../redux/hooks";
-import { login } from "../redux/reducers/loginSlide";
+import { useAppDispatch} from "../redux/hooks";
+import {login} from "../redux/slide/loginSlide";
 
 const theme = createTheme();
 
@@ -97,7 +97,7 @@ export default function SignIn() {
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href='#' variant="body2" onClick={() =>{navigate("/register")}}>
+                                <Link href='#' variant="body2" onClick={() =>{navigate("dashboard/register")}}>
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>

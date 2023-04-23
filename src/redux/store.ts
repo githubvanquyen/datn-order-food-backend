@@ -10,8 +10,8 @@ import {
     REGISTER,
   } from "redux-persist";
   import storage from "redux-persist/lib/storage";
-import loginReducer from "./reducers/loginSlide"
-import productReducer from "./reducers/producSlide";
+import loginReducer from "./slide/loginSlide"
+import productReducer from "./slide/productReducer";
 
 const persistConfig = {
     key: "root",

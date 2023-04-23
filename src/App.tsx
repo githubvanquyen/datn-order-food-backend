@@ -1,5 +1,6 @@
 import "./global.css"
 import "./assets/global.css";
+import '@shopify/polaris/build/esm/styles.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./home/Home";
 import Login from "./login/Login";
@@ -15,7 +16,7 @@ const App = () => (
     <BrowserRouter>
         <Routes>
             <Route
-                path="/"
+                path="/admin"
                 element={
                     <ProtectedRoute>
                         <Home />
@@ -23,12 +24,13 @@ const App = () => (
                 }
             >
                 <Route path="product" element={<Product/>}/>
-                <Route path="create" element={<Create />} />
+                <Route path="product/create" element={<Create />} />
+                <Route path="product/:id" element={<Create />} />
                 <Route path="order" element={<Order />} />
                 <Route path="drafts" element={<Drafts />} />
             </Route>
             <Route
-                path="/login"
+                path="admin/login"
                 element={
                     <PublishedRoute>
                         <Login />
@@ -36,7 +38,7 @@ const App = () => (
                 }
             />
             <Route
-                path="/register"
+                path="admin/register"
                 element={
                     <PublishedRoute>
                         <Register />

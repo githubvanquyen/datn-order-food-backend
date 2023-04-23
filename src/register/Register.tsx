@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useAppDispatch } from '../redux/hooks';
-import { register } from '../redux/reducers/loginSlide';
+import { register } from '../redux/slide/loginSlide';
 
 const theme = createTheme();
 
@@ -24,12 +24,6 @@ const Register = () => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            firstName: data.get('firstName') as string,
-            lastName: data.get('lastName') as string,
-            email: data.get('email') as string,
-            password: data.get('password') as string
-        });
         const datalogin = {
             firstName: data.get('firstName') as string,
             lastName: data.get('lastName') as string,
@@ -112,7 +106,7 @@ const Register = () => {
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <Link variant="body2" onClick={() =>{navigate("/login")}} href='#'>
+                                <Link variant="body2" onClick={() =>{navigate("admin/login")}} href='#'>
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>
