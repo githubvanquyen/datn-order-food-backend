@@ -3,3 +3,38 @@
     margin: 0;
     padding: 0;
 }
+.Polaris-Choice {
+    align-items: center;
+}
+
+.Polaris-Choice__Label {
+    margin-right: 16px;
+    margin-left: 10px;
+}
+
+.product-search-list {
+    display: flex;
+    align-items: center;
+}
+
+.date-time{
+    display: flex;
+}
+
+.date-start{
+    width: 50%;
+    padding-right: 8px;
+}
+
+.date-end{
+    padding-left: 8px;
+    width: 50%;
+}
+
+
+.date-time input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+}

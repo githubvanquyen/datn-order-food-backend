@@ -1,6 +1,6 @@
 import React , {useCallback, useState} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ProductsMinor, OrdersMinor, DraftOrdersMajor } from '@shopify/polaris-icons';
+import { ProductsMinor, OrdersMinor, CollectionReferenceMinor, AnalyticsMinor, CustomersMinor, DiscountsMinor, CashDollarMinor } from '@shopify/polaris-icons';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import {AppProvider, Frame, TopBar, Navigation} from '@shopify/polaris';
 
@@ -38,21 +38,42 @@ const Layout = ({children}: LayoutProps) => {
             <Navigation.Section
                 items={[
                     {
-                        label: "Product",
+                        label: "Sản phẩm",
                         icon: ProductsMinor,
                         selected: checkIsSelected("product"),
-                        onClick: () =>{navigate("/admin/product")}
+                        onClick: () =>{navigate("/product")}
                     },{
-                        label: "Order",
+                        label: "Danh mục sản phẩm",
+                        icon: CollectionReferenceMinor,
+                        selected: checkIsSelected("collection"),
+                        onClick: () =>{navigate("/collection")}
+                    },{
+                        label: "Khách hàng",
+                        icon: CustomersMinor,
+                        selected: checkIsSelected("customer"),
+                        onClick: () =>{navigate("/customer")}
+                    },{
+                        label: "Đơn đặt hàng",
                         icon: OrdersMinor,
                         selected: checkIsSelected("order"),
-                        onClick: () =>{navigate("/admin/order")}
+                        onClick: () =>{navigate("/order")}
                     },{
-                        label: "Drafts",
-                        icon: DraftOrdersMajor,
-                        selected: checkIsSelected("drafts"),
-                        onClick: () =>{navigate("/admin/drafts")}
+                        label: "Khuyến mãi",
+                        icon: DiscountsMinor,
+                        selected: checkIsSelected("flashsale"),
+                        onClick: () =>{navigate("/flashsale")}
+                    },{
+                        label: "Mã Giảm giá",
+                        icon: CashDollarMinor,
+                        selected: checkIsSelected("discount"),
+                        onClick: () =>{navigate("/discount")}
+                    },{
+                        label: "Thống kê",
+                        icon: AnalyticsMinor,
+                        selected: checkIsSelected("analysis"),
+                        onClick: () =>{navigate("/analysis")}
                     }
+
                 ]}
             />
         </Navigation>

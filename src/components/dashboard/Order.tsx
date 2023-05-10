@@ -23,7 +23,10 @@ import {
 } from "recharts";
 import axios from "axios";
 import priceFormat from "../../utils/priceFormat";
-
+import dateFormat from "../../utils/dateFormat";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@shopify/polaris";
+import {styled} from "@mui/material/styles"
 function createDataChart(time: string, amount?: number) {
     return { time, amount };
   }
@@ -40,66 +43,13 @@ function createDataChart(time: string, amount?: number) {
     createDataChart('24:00', undefined),
   ];
 
-function createData(
-    id: number,
-    date: string,
-    name: string,
-    shipTo: string,
-    paymentMethod: string,
-    amount: number
-) {
-    return { id, date, name, shipTo, paymentMethod, amount };
-}
 
-const rows = [
-    createData(
-        0,
-        "16 Mar, 2019",
-        "Elvis Presley",
-        "Tupelo, MS",
-        "VISA ⠀•••• 3719",
-        312.44
-    ),
-    createData(
-        1,
-        "16 Mar, 2019",
-        "Paul McCartney",
-        "London, UK",
-        "VISA ⠀•••• 2574",
-        866.99
-    ),
-    createData(
-        2,
-        "16 Mar, 2019",
-        "Tom Scholz",
-        "Boston, MA",
-        "MC ⠀•••• 1253",
-        100.81
-    ),
-    createData(
-        3,
-        "16 Mar, 2019",
-        "Michael Jackson",
-        "Gary, IN",
-        "AMEX ⠀•••• 2000",
-        654.39
-    ),
-    createData(
-        4,
-        "15 Mar, 2019",
-        "Bruce Springsteen",
-        "Long Branch, NJ",
-        "VISA ⠀•••• 5919",
-        212.79
-    ),
-];
-
-const drawerWidth: number = 240;
-
-interface AppBarProps extends MuiAppBarProps {
-    open?: boolean;
-}
-const mdTheme = createTheme();
+const Item = styled(TableRow)(({ theme }) => ({
+    ":hover": {
+        backgroundColor: "rgba(235, 236, 239, 1)",
+        cursor: "pointer"
+    }
+  }));
 
 function preventDefault(event: React.MouseEvent) {
     event.preventDefault();
@@ -107,7 +57,8 @@ function preventDefault(event: React.MouseEvent) {
 function DashboardContent() {
     const [orders, setOrders] = React.useState([]);
     const date = new Date()
-    
+    const navigate = useNavigate()
+
     React.useEffect(() =>{
         const fetchOrders =  async () =>{
             const responseOrders = await axios.get("http://localhost:4000/api/order/get-all-order")
@@ -119,7 +70,7 @@ function DashboardContent() {
     },[])
 
     let total = 0;
-    orders.map((order) =>{
+    orders.map((order:any) =>{
         total += order.totalPrice;
     })
 
@@ -224,31 +175,30 @@ function DashboardContent() {
                     </Grid>
                     {/* Recent Orders */}
                     <Grid item xs={12}>
-                        <Paper
+                    <Paper
                             sx={{
-                                p: 2,
                                 display: "flex",
                                 flexDirection: "column",
                             }}
                         >
-                            <div>Đơn đặt hàng gần đây</div>
-                            <Table size="small">
+                            <Table size="medium">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Ngày</TableCell>
                                         <TableCell>Tên </TableCell>
                                         <TableCell>Địa chỉ </TableCell>
                                         <TableCell>Phương thức thanh toán</TableCell>
-                                        <TableCell align="right">
+                                        <TableCell>Trạng thái</TableCell>
+                                        <TableCell>
                                             Tổng tiền
                                         </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {orders.map((order: any) => (
-                                        <TableRow key={order.id}>
-                                            <TableCell>{order.createdAt}</TableCell>
-                                            <TableCell>{order.user.firstName + " " + order.user.lastName}</TableCell>
+                                        <Item key={order.id} onClick={() => { navigate(`/order/${order.id}`)}}>
+                                            <TableCell>{dateFormat(order.createdAt)}</TableCell>
+                                            <TableCell>{order.user !== null ? (order.user.firstName + " " + order.user.lastName) : order.userName}</TableCell>
                                             <TableCell>{
                                             "Tòa " + order.addressShiping.split(" ")[0] + 
                                             ", Tầng " + order.addressShiping.split(" ")[1] +
@@ -257,8 +207,17 @@ function DashboardContent() {
                                             <TableCell>
                                                 {order.methodPayment === "1" ? "Thanh toán qua MOMO" : "Thanh toán bằng tiền mặt"}
                                             </TableCell>
-                                            <TableCell align="right">{`${priceFormat.format(order.totalPrice)}`}</TableCell>
-                                        </TableRow>
+                                            <TableCell>
+                                                <p>
+                                                    {
+                                                        (order?.statusOrder === "-1") ? (<Badge status='attention'>Đang chờ xác nhận</Badge>) : (
+                                                            order?.statusOrder === "0" ? (<Badge status='critical'>Đang giao hàng</Badge>) : (<Badge status='success'>Đã giao hàng</Badge>))
+                                                       
+                                                    }
+                                                </p>
+                                            </TableCell>
+                                            <TableCell>{`${priceFormat.format(order.totalPrice)}`}</TableCell>
+                                        </Item>
                                     ))}
                                 </TableBody>
                             </Table>

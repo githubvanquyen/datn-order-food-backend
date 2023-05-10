@@ -31,7 +31,7 @@ const initialProduct:IProduct = {
 
 
 export const createProduct = createAsyncThunk("product/create", async(data: IFieldInput) =>{
-    const response = await axios.post<IResponse>("http://localhost:4000/product/create",{
+    const response = await axios.post<IResponse>("http://localhost:4000/api/product/create",{
         ...data
     })
     return response.data

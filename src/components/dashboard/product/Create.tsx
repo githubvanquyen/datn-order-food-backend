@@ -86,6 +86,8 @@ const Create = () => {
     })
 
     const location = useLocation()
+    const urlSplit =  location.pathname.split("/");
+    const id = urlSplit[urlSplit.length - 1];
 
     const [file, setFile] = useState<File>();
     const [fileData, setFileData] = useState<string | ArrayBuffer | null>();
@@ -96,6 +98,7 @@ const Create = () => {
         optionPrice: [],
         statusOpen: false
     })
+    const [variantId, setVariantId] = useState([]);
 
     const handleDropZoneDrop = useCallback(
     (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>{
@@ -132,6 +135,7 @@ const Create = () => {
 
     const handleSave = useCallback(async() =>{
         const response = await axios.post("http://localhost:4000/api/product/create",{
+            id: id,
             name: input.name,
             description: input.description,
             regularPrice: input.regularPrice,
@@ -140,7 +144,8 @@ const Create = () => {
             collectionId: collection.collectionSelected[0].id,
             variantName: variant.optionName,
             variantPrice: variant.optionPrice,
-            variantType: variant.optionType
+            variantType: variant.optionType,
+            variantId: variantId,
         })  
         console.log(response.data);
     },[input, collection, variant])
@@ -149,7 +154,7 @@ const Create = () => {
         <ContextualSaveBar
         saveAction={{
             onAction: handleSave,
-            content: "Save"
+            content: "Lưu"
         }}/>) : null
 
     useEffect(() =>{
@@ -254,9 +259,7 @@ const Create = () => {
             })
             dispatchVariant({optionName: variantChanged, optionPrice: variantChanged2})
         }
-        setVariantOptionMarkUp(variantMarkup)
-        console.log(variant);
-        
+        setVariantOptionMarkUp(variantMarkup)        
     }, [variant])
 
     const handleModalCollection = useCallback(() =>{
@@ -286,8 +289,6 @@ const Create = () => {
     useEffect(() =>{
         const fetchData = async () =>{
             if(location.pathname.indexOf("create") === -1){
-                const urlSplit =  location.pathname.split("/");
-                const id = urlSplit[urlSplit.length - 1];
                 const response =  await axios.get(`http://localhost:4000/api/product/get-product-by-id?id=${id}`);
                 if(response.data.success){
                     const {name, description, regularPrice, salePrice, collection, image, variants} = response.data.data
@@ -304,6 +305,13 @@ const Create = () => {
                     let optionPrices =  variants.map((item: any) =>{
                         return [...JSON.parse(item.price), 0];
                     })
+
+                    let variantIds =  variants.map((item: any) =>{
+                        return item.id
+                    })
+
+                    setVariantId(variantIds)
+
                     dispatchVariant({optionName: optionNames, optionType: optionTypes, optionPrice: optionPrices, statusOpen: true })
                 }              
                 

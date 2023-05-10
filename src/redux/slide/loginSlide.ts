@@ -37,14 +37,14 @@ const initialLogin: loginState = {
 }
 
 export const register = createAsyncThunk("login/setRegister", async(data: registerRequest) =>{
-    const response = await axios.post<loginResponse>("http://localhost:4000/user/register",{
+    const response = await axios.post<loginResponse>("http://localhost:4000/api/user/register",{
         ...data
     })
     return response.data
 })
 
 export const login = createAsyncThunk("login/setLogin", async(data: loginRequest) =>{
-    const response = await axios.post<loginResponse>("http://localhost:4000/user/login",{
+    const response = await axios.post<loginResponse>("http://localhost:4000/api/user/login",{
         ...data
     })
     return response.data

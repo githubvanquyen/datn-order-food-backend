@@ -10,7 +10,7 @@ const PublishedRoute = ({children}:propsPublishedRoute) => {
     let location = useLocation();
 
     if(login.isAuthenticated && login.accessToken) {
-        return <Navigate to="/admin/product" state={{ from: location}} replace/>
+        return <Navigate to="/product" state={{ from: location}} replace/>
     }
     return children
 };

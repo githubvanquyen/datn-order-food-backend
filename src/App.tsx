@@ -4,19 +4,27 @@ import '@shopify/polaris/build/esm/styles.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./home/Home";
 import Login from "./login/Login";
-import Register from "./register/Register";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import PublishedRoute from "./utils/publishedRoute";
 import Product from "./components/dashboard/product/Index";
+import Flashsale from "./components/dashboard/Flashsale/Index";
+import CreateFls from "./components/dashboard/Flashsale/Create";
+import CreateCollection from "./components/dashboard/Collection/Create";
+import Collection from "./components/dashboard/Collection/Index";
+import Discount from "./components/dashboard/Discount/Index";
+import Analysis from "./components/dashboard/Analysis/Index";
+import CreateDiscount from "./components/dashboard/Discount/Create";
 import Order from "./components/dashboard/Order";
-import Drafts from "./components/dashboard/Drafts";
+import Customer from "./components/dashboard/Customer";
 import Create from "./components/dashboard/product/Create";
+import OrderDetail from "./components/dashboard/OrderDetail";
+import CustomerDetail from "./components/dashboard/CustomerDetail";
 
 const App = () => (
     <BrowserRouter>
         <Routes>
             <Route
-                path="/admin"
+                path="/"
                 element={
                     <ProtectedRoute>
                         <Home />
@@ -27,21 +35,22 @@ const App = () => (
                 <Route path="product/create" element={<Create />} />
                 <Route path="product/:id" element={<Create />} />
                 <Route path="order" element={<Order />} />
-                <Route path="drafts" element={<Drafts />} />
+                <Route path="order/:id" element={<OrderDetail />} />
+                <Route path="customer" element={<Customer />} />
+                <Route path="customer/:id" element={<CustomerDetail />} />
+                <Route path="discount" element={<Discount />} />
+                <Route path="discount/:id" element={<CreateDiscount />} />
+                <Route path="flashsale" element={<Flashsale />} />
+                <Route path="collection" element={<Collection />} />
+                <Route path="flashsale/:id" element={<CreateFls />} />
+                <Route path="collection/:id" element={<CreateCollection />} />
+                <Route path="analysis" element={<Analysis />} />
             </Route>
             <Route
-                path="admin/login"
+                path="/login"
                 element={
                     <PublishedRoute>
                         <Login />
-                    </PublishedRoute>
-                }
-            />
-            <Route
-                path="admin/register"
-                element={
-                    <PublishedRoute>
-                        <Register />
                     </PublishedRoute>
                 }
             />
