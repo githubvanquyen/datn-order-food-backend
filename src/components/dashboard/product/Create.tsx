@@ -16,12 +16,13 @@ import {
     Text,
     TextField,
     Thumbnail,
+    Toast,
 } from "@shopify/polaris";
 
 import { NoteMinor, PlusMinor, DeleteMinor } from "@shopify/polaris-icons";
 import axios, { Axios } from "axios";
 import { useCallback, useState, useRef, useReducer, useEffect, useMemo, JSXElementConstructor } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface collectionData{
     name: string
@@ -88,6 +89,7 @@ const Create = () => {
     const location = useLocation()
     const urlSplit =  location.pathname.split("/");
     const id = urlSplit[urlSplit.length - 1];
+    const navigate = useNavigate()
 
     const [file, setFile] = useState<File>();
     const [fileData, setFileData] = useState<string | ArrayBuffer | null>();
@@ -99,6 +101,11 @@ const Create = () => {
         statusOpen: false
     })
     const [variantId, setVariantId] = useState([]);
+    const [active, setActive] = useState(false);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState(false);
+
+    const toggleActive = useCallback(() => setActive((active) => !active), []);
 
     const handleDropZoneDrop = useCallback(
     (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>{
@@ -146,8 +153,24 @@ const Create = () => {
             variantPrice: variant.optionPrice,
             variantType: variant.optionType,
             variantId: variantId,
-        })  
-        console.log(response.data);
+        })
+        if(response.data.success){
+            if(id === "create"){
+                setMessage("Tạo mới sản phẩm đồ ăn thành công")
+            }else{
+                setMessage("Cập nhật sản phẩm đồ ăn thành công")
+            }
+            setActive(true)
+            navigate("/product")
+        }else{
+            if(id === "create"){
+                setMessage("Tạo mới sản phẩm đồ ăn thất bại")
+            }else{
+                setMessage("Cập nhật sản phẩm đồ ăn thất bại")
+            }
+            setError(true)
+            setActive(true)
+        }
     },[input, collection, variant])
 
     const contextualSaveBarMarkup = (JSON.stringify(input) !== JSON.stringify(inputDefault.current)) ? (
@@ -319,7 +342,9 @@ const Create = () => {
         }
         fetchData().then(() =>{})
     },[])
-    
+    const toastMarkup = active ? (
+        <Toast content={message} onDismiss={toggleActive} error={error}/>
+    ) : null;
 
     return (
         <Page>
@@ -439,6 +464,7 @@ const Create = () => {
                     }
                 </Modal.Section>
             </Modal>
+            {toastMarkup}
         </Page>
     );
 };

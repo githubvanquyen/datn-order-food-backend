@@ -1,4 +1,4 @@
-import { Banner, Button, ButtonGroup, Checkbox, FormLayout, LegacyCard, Modal, Page, TextField, Thumbnail, ContextualSaveBar, DropZone, LegacyStack, Text } from '@shopify/polaris'
+import { Banner, Button, ButtonGroup, Checkbox, FormLayout, LegacyCard, Modal, Page, TextField, Thumbnail, ContextualSaveBar, DropZone, LegacyStack, Text, Toast } from '@shopify/polaris'
 import axios from 'axios';
 import React, { useCallback, useState, useEffect, ChangeEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -23,6 +23,11 @@ const CreateColletion = () => {
     const [productSelected, setProductSelected] = useState([]);
     const [file, setFile] = useState<File>();
     const [fileData, setFileData] = useState<string | ArrayBuffer | null>();
+    const [activeToast, setActiveToast] = useState(false);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState(false);
+
+    const toggleActive = useCallback(() => setActiveToast((active) => !active), []);
 
     const handleDropZoneDrop = useCallback(
         (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>{
@@ -73,7 +78,7 @@ const CreateColletion = () => {
     },[productTitle])
 
     const getCollection = useCallback(async() =>{
-        const response = await axios.get(`http://localhost:4000/api/colleciton/get-collection-by-id?id=${id}`);
+        const response = await axios.get(`http://localhost:4000/api/collection/get-collection-by-id?id=${id}`);
         if(response.data.success){
             setManualInfo((pre) => ({
                 ...pre, 
@@ -124,10 +129,7 @@ const CreateColletion = () => {
             {product.name}
         </div>;
     })
-
-    console.log(idProductSelected);
     
-
     const handleSave = async () =>{
         const saveReq =  await axios.post("http://localhost:4000/api/collection/create", {
             id: id,
@@ -137,8 +139,21 @@ const CreateColletion = () => {
         })
 
         if(saveReq.data.success){
-            alert("Thêm mới danh mục sản phẩm thành công")
+            if(id === "create"){
+                setMessage("Tạo mới danh mục sản phẩm đồ ăn thành công")
+            }else{
+                setMessage("Cập nhật danh mục sản phẩm đồ ăn thành công")
+            }
+            setActiveToast(true)
             navigate("/collection")
+        }else{
+            if(id === "create"){
+                setMessage("Tạo mới danh mục sản phẩm đồ ăn thất bại")
+            }else{
+                setMessage("Cập nhật danh mục sản phẩm đồ ăn thất bại")
+            }
+            setError(true)
+            setActiveToast(true)
         }
     }
 
@@ -158,10 +173,14 @@ const CreateColletion = () => {
         }
     },[])
 
+    const toastMarkup = activeToast ? (
+        <Toast content={message} onDismiss={toggleActive} error={error}/>
+    ) : null;
+
     return (
         <Page>
             {contextualSaveBarMarkup}
-
+            {toastMarkup}
             <LegacyCard
                 title="Thông tin mã giảm giá"
             >

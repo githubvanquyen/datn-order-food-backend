@@ -67,10 +67,14 @@ const Index = () => {
           </>
         ]))
         setCurrentPage(1);
+
         setTotalPage(Math.ceil(response.data.data.length / Number(PRODUCT_PAGE.current)));
       }
       fetchData().then()
-    }, [deleteStatus, collectionType])
+      if(queryValue === ""){
+        fetchData().then()
+      }
+    }, [deleteStatus, collectionType, queryValue])
 
     useEffect(() =>{
       const fetchCollection =  async() =>{
@@ -232,12 +236,23 @@ const Index = () => {
       sortedRow.length > Number(PRODUCT_PAGE) ? setTotalPage(Math.ceil(sortedRow.length / Number(PRODUCT_PAGE))) : setTotalPage(1);
       rowsData.current = sortedRow
     }
+    if(queryValue !== ""){
+      let sortedRow = rowsData.current.filter((item:any) => (item[1].indexOf(queryValue) !== -1))
+      console.log(sortedRow);
+      
+      setCurrentPage(1);
+      sortedRow.length > Number(PRODUCT_PAGE) ? setTotalPage(Math.ceil(sortedRow.length / Number(PRODUCT_PAGE))) : setTotalPage(1);
+      rowsData.current = sortedRow
+    }else{
 
-  },[property, collectionType, moneySpent])
+    }
 
+  },[property, collectionType, moneySpent, queryValue, setQueryValue])
+  console.log(queryValue);
+  
   useEffect(() =>{  
     setRowPerPage(rowsData.current.slice((currentPage - 1) * Number(PRODUCT_PAGE.current), currentPage * Number(PRODUCT_PAGE.current)))
-  },[deleteStatus, currentPage, property, collectionType, moneySpent])
+  },[deleteStatus, currentPage, property, collectionType, moneySpent, queryValue])
   
   const newrow = rowPerPage.map((item: [string, string]) => {
     return item.map((itemI, index) =>{

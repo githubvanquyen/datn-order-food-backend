@@ -11,6 +11,8 @@ import Flashsale from "./components/dashboard/Flashsale/Index";
 import CreateFls from "./components/dashboard/Flashsale/Create";
 import CreateCollection from "./components/dashboard/Collection/Create";
 import Collection from "./components/dashboard/Collection/Index";
+import Blog from "./components/dashboard/Blog/Index";
+import CreateBlog from "./components/dashboard/Blog/Create";
 import Discount from "./components/dashboard/Discount/Index";
 import Analysis from "./components/dashboard/Analysis/Index";
 import CreateDiscount from "./components/dashboard/Discount/Create";
@@ -45,6 +47,8 @@ const App = () => (
                 <Route path="flashsale/:id" element={<CreateFls />} />
                 <Route path="collection/:id" element={<CreateCollection />} />
                 <Route path="analysis" element={<Analysis />} />
+                <Route path="blog" element={<Blog />} />
+                <Route path="blog/:id" element={<CreateBlog />} />
             </Route>
             <Route
                 path="/login"

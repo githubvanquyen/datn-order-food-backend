@@ -1,6 +1,6 @@
 import React , {useCallback, useState} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ProductsMinor, OrdersMinor, CollectionReferenceMinor, AnalyticsMinor, CustomersMinor, DiscountsMinor, CashDollarMinor } from '@shopify/polaris-icons';
+import { ProductsMinor, OrdersMinor, CollectionReferenceMinor, AnalyticsMinor, CustomersMinor, DiscountsMinor, CashDollarMinor, BlogMajor } from '@shopify/polaris-icons';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import {AppProvider, Frame, TopBar, Navigation} from '@shopify/polaris';
 
@@ -25,7 +25,7 @@ const Layout = ({children}: LayoutProps) => {
         },
         logo: {
             width: 32,
-            topBarSource: "http://127.0.0.1:5173/public/vite.svg",
+            topBarSource: "http://127.0.0.1:5173/public/Logo_DHCNHN.png",
             accessibilityLabel: 'Dashboard',
         },
     };
@@ -72,8 +72,12 @@ const Layout = ({children}: LayoutProps) => {
                         icon: AnalyticsMinor,
                         selected: checkIsSelected("analysis"),
                         onClick: () =>{navigate("/analysis")}
+                    },{
+                        label: "Bài viết",
+                        icon: BlogMajor,
+                        selected: checkIsSelected("blog"),
+                        onClick: () =>{navigate("/blog")}
                     }
-
                 ]}
             />
         </Navigation>

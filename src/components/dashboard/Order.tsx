@@ -29,7 +29,7 @@ import { Badge } from "@shopify/polaris";
 import {styled} from "@mui/material/styles"
 function createDataChart(time: string, amount?: number) {
     return { time, amount };
-  }
+}
   
   const data = [
     createDataChart('00:00', 0),
@@ -40,7 +40,6 @@ function createDataChart(time: string, amount?: number) {
     createDataChart('15:00', 2000),
     createDataChart('18:00', 2400),
     createDataChart('21:00', 2400),
-    createDataChart('24:00', undefined),
   ];
 
 
@@ -56,14 +55,22 @@ function preventDefault(event: React.MouseEvent) {
 }
 function DashboardContent() {
     const [orders, setOrders] = React.useState([]);
+    const [data, setData] = React.useState([]);
     const date = new Date()
     const navigate = useNavigate()
 
     React.useEffect(() =>{
         const fetchOrders =  async () =>{
             const responseOrders = await axios.get("http://localhost:4000/api/order/get-all-order")
+            const responseOrdersByTime = await axios.get("http://localhost:4000/api/order/get-order-by-time")
+            
             if(responseOrders.data.success){
                 setOrders(responseOrders.data.data);
+            }
+
+            if(responseOrdersByTime.data.success){
+                const dataChart = responseOrdersByTime.data.data.map((item: number, index: number) => createDataChart(`${index * 3}:00`, item))
+                setData(dataChart);
             }
         }
         fetchOrders().then()
@@ -71,7 +78,10 @@ function DashboardContent() {
 
     let total = 0;
     orders.map((order:any) =>{
-        total += order.totalPrice;
+        const dateOrder = new Date(order.createdAt);
+        if(dateOrder.getMonth() == date.getMonth() && dateOrder.getDate() == date.getDate()){
+            total += order.totalPrice;
+        }
     })
 
     return (
@@ -124,7 +134,7 @@ function DashboardContent() {
                                                     textAnchor: "middle",
                                                 }}
                                             >
-                                                Sales ($)
+                                                Tổng tiền (đ)
                                             </Label>
                                         </YAxis>
                                         <Line
@@ -160,7 +170,7 @@ function DashboardContent() {
                                 { priceFormat.format(total) }
                             </Typography>
                             <Typography color="text.secondary" sx={{ flex: 1 }}>
-                                {date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()}
+                                {(date.getMonth()+ 1) + "/" + date.getDate() + "/" + date.getFullYear()}
                             </Typography>
                             <div>
                                 <Link
