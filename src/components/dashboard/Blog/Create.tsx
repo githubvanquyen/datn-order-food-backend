@@ -16,6 +16,7 @@ const CreateColletion = () => {
     const id = pathNameSplit[pathNameSplit.length - 1];
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [image, setImage] = useState("");
     const [file, setFile] = useState<File>();
     const [fileData, setFileData] = useState<string | ArrayBuffer | null>();
     const [activeToast, setActiveToast] = useState(false);
@@ -58,6 +59,7 @@ const CreateColletion = () => {
         if(response.data.success){
             setTitle(response.data.data.title)
             setContent(response.data.data.content)
+            setImage(response.data.data.image)
         }
     },[id])
     
@@ -122,6 +124,17 @@ const CreateColletion = () => {
                             value={title} 
                             onChange={(value) => setTitle(value)}
                         />
+
+                        {
+                        (id !== "create" && image) && (
+                            <div style={{ width: "40%" }}>
+                                <div>
+                                    Ảnh gốc
+                                </div>
+                                <img src={image} width="100%"/>
+                            </div>
+                        )
+                        }   
                         <DropZone
                         allowMultiple={false}
                         onDrop={handleDropZoneDrop}

@@ -104,6 +104,7 @@ const Create = () => {
     const [active, setActive] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState(false);
+    const [image, setImage] = useState("");
 
     const toggleActive = useCallback(() => setActive((active) => !active), []);
 
@@ -172,6 +173,9 @@ const Create = () => {
             setActive(true)
         }
     },[input, collection, variant])
+
+    console.log(fileData);
+    
 
     const contextualSaveBarMarkup = (JSON.stringify(input) !== JSON.stringify(inputDefault.current)) ? (
         <ContextualSaveBar
@@ -316,6 +320,7 @@ const Create = () => {
                 if(response.data.success){
                     const {name, description, regularPrice, salePrice, collection, image, variants} = response.data.data
                     setInput((pre) => ({...pre, name: name, description:description, regularPrice:regularPrice, salePrice: salePrice }))
+                    setImage(image);
                     dispatch({collectionSelected: [collection]})
                     let optionTypes=  variants.map((item: any) => {
                         return item.title
@@ -382,6 +387,16 @@ const Create = () => {
                         onChange={handleDescriptionChange}
                         autoComplete="off"
                     />
+                    {
+                        (id !== "create" && image) && (
+                            <div>
+                                <div>
+                                    Ảnh gốc
+                                </div>
+                                <img src={image}/>
+                            </div>
+                        )
+                    }
                     <DropZone
                         allowMultiple={false}
                         onDrop={handleDropZoneDrop}

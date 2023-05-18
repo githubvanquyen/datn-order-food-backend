@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 interface ManualInfo {
     name: string,
+    image: string
 }
 
 const CreateColletion = () => {
@@ -15,6 +16,7 @@ const CreateColletion = () => {
     const id = pathNameSplit[pathNameSplit.length - 1];
     const [manualInfo, setManualInfo] = useState<ManualInfo>({
         name: "",
+        image: ""
     })
     const [productTitle, setProductTitle] = useState("");
     const [active, setActive] = useState(false);
@@ -193,6 +195,16 @@ const CreateColletion = () => {
                             value={manualInfo.name} 
                             onChange={handleChangeManualInfoNameCollection}
                         />
+                        {
+                            (id !== "create" && manualInfo) && (
+                                <div style={{ width: "40%" }}>
+                                    <div>
+                                        Ảnh gốc
+                                    </div>
+                                    <img src={manualInfo.image} width="100%"/>
+                                </div>
+                            )
+                        }
                         <DropZone
                         allowMultiple={false}
                         onDrop={handleDropZoneDrop}

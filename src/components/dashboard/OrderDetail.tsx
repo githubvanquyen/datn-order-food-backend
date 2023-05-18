@@ -9,6 +9,7 @@ interface orderData {
     createdAt: string
     id: number
     methodPayment: string
+    phoneNumber: string
     note: string
     products: {
         description: string,
@@ -50,7 +51,17 @@ interface orderData {
             id: number[],
             index: number[]
         }
-    }[]
+    }[],
+    discount: {
+        name: string,
+        id: number
+        value: string,
+        type: number,
+        minimumPrice: string,
+        maximumDiscount: string,
+        expiredDate: string,
+        quantity: number,
+    }  
 }
 
 interface orderResponse {
@@ -70,8 +81,8 @@ const OrderDetail = () => {
     const urlSplit =  location.pathname.split("/");
     const id = urlSplit[urlSplit.length - 1];
     const [order, setOrder] = useState<orderData | null>(null);
-    const [isUpdateOrder, setIsUpdateOrder] = useState(false);
-
+    const [isUpdateOrder, setIsUpdateOrder] = useState(0);
+    const newTotalPrice = React.useRef(0);
     useEffect(() =>{
         const fetchOrder = async () =>{
             const response = await axios.get<any, orderResponse>(`http://localhost:4000/api/order/get-order-by-id?id=${id}`)
@@ -81,6 +92,23 @@ const OrderDetail = () => {
         }
         fetchOrder()
     },[isUpdateOrder])
+    useEffect(() =>{
+        if(order && order.discount){
+            if(order.discount.type === 1){
+                const priceSale = Math.floor(order.totalPrice / 100 * Number(order.discount.value))
+                if(priceSale > Number(order.discount.maximumDiscount)){
+                    newTotalPrice.current = order.totalPrice - Number(order?.discount.maximumDiscount);
+                }else{
+                    newTotalPrice.current =  order.totalPrice - Math.floor(order.totalPrice / 100 * Number(order?.discount.value));
+                }
+            }else{
+                newTotalPrice.current =  order.totalPrice - Number(order?.discount.value)
+            }
+        }
+        if(order && !order.discount){
+            newTotalPrice.current = order.totalPrice
+        }
+    },[order])
 
     const handleChangeStatusOrder = async () =>{
         const fetchChangeOrder = await axios.put<any, orderResponse>("http://localhost:4000/api/order/update-status-order",{
@@ -88,7 +116,19 @@ const OrderDetail = () => {
             statusOrder: (order?.statusOrder === "-1") ? ("0") : ( order?.statusOrder === "0" ? ("1") : ("")),
         })
         if(fetchChangeOrder.data.success){
-            setIsUpdateOrder(true);
+            setIsUpdateOrder((pre) => pre + 1)
+            alert("Đơn hàng đã được cập nhật")
+        }
+    }
+
+    const handleChangePayment = async () =>{
+        const fetchChangeOrder = await axios.put<any, orderResponse>("http://localhost:4000/api/order/update-status-order",{
+            id: id,
+            statusPayment: "1",
+        })
+        if(fetchChangeOrder.data.success){
+            setIsUpdateOrder((pre) => pre + 1)
+            alert("Xác nhận thanh toán thành công")
         }
     }
 
@@ -103,13 +143,19 @@ const OrderDetail = () => {
                             onAction: () =>{handleChangeStatusOrder()},
                             disabled: order?.statusOrder === "1" ? true :false
                         }}
+                        secondaryFooterActions={[{content: 'Xác nhận đã thanh toán', destructive: true, onAction: () => {handleChangePayment()}}]}
                     >
                         <LegacyCard.Section>
                             <p>{
                                 (order?.statusOrder === "-1") ? (<Badge status='attention'>Đang chờ xác nhận</Badge>) : (
                                     order?.statusOrder === "0" ? (<Badge status='critical'>Đang giao hàng</Badge>) : (<Badge status='success'>Đã giao hàng</Badge>)
                                 )
-                            }</p>
+                                
+                            }{
+                                (order?.statusPayment === "-1") ? (<Badge status='attention'>Chưa thanh toán</Badge>) : (
+                                order?.statusPayment === "0" ? (<Badge status='critical'>Thanh toán thất bại</Badge>) : (<Badge status='success'>Đã thanh toán</Badge>))
+                            }
+                            </p>
                         </LegacyCard.Section>
                         <LegacyCard.Section>
                         {
@@ -171,6 +217,18 @@ const OrderDetail = () => {
                             ))
                         }
                         </LegacyCard.Section>
+                        {
+                            order?.discount && <LegacyCard.Section>
+                                <div style={{ textAlign: "right"}}>
+                                    {`Mã giảm giá: ${order?.discount.name}`}
+                                </div>
+                            </LegacyCard.Section>
+                        }
+                        <LegacyCard.Section>
+                            <div style={{ textAlign: "right"}}>
+                                Tổng tiền : {priceFormat.format(Number(newTotalPrice.current))}
+                            </div>
+                        </LegacyCard.Section>
                     </LegacyCard>
                 </Grid.Cell>
                 <Grid.Cell columnSpan={{ xl: 5, xs: 6 }}>
@@ -186,7 +244,7 @@ const OrderDetail = () => {
                                         order.user !== null ? order.user.email : "không có email"
                                     }</p>
                                     <p>{
-                                        order.user !== null ? order.user.phoneNumber : "không có SĐT"
+                                        order.phoneNumber
                                     }</p>
                                 </LegacyCard.Section>
                                 <LegacyCard.Section title="Địa chỉ">

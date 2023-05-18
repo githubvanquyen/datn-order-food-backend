@@ -130,7 +130,7 @@ const Index = () => {
                     <LegacyCard.Section>
                         {total.user}
                         <LegacyStack distribution="trailing">
-                            <Button plain onClick={() =>{navigate("/user")}}>Xem khách hàng</Button>
+                            <Button plain onClick={() =>{navigate("/customer")}}>Xem khách hàng</Button>
                         </LegacyStack>
                     </LegacyCard.Section>
                 </LegacyCard>

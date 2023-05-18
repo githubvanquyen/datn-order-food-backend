@@ -198,6 +198,7 @@ function DashboardContent() {
                                         <TableCell>Tên </TableCell>
                                         <TableCell>Địa chỉ </TableCell>
                                         <TableCell>Phương thức thanh toán</TableCell>
+                                        <TableCell>Trạng thái thanh toán</TableCell>
                                         <TableCell>Trạng thái</TableCell>
                                         <TableCell>
                                             Tổng tiền
@@ -216,6 +217,14 @@ function DashboardContent() {
                                             }</TableCell>
                                             <TableCell>
                                                 {order.methodPayment === "1" ? "Thanh toán qua MOMO" : "Thanh toán bằng tiền mặt"}
+                                            </TableCell>
+                                            <TableCell>
+                                                <p>
+                                                    {
+                                                        (order?.statusPayment === "-1") ? (<Badge status='attention'>Chưa thanh toán</Badge>) : (
+                                                            order?.statusPayment === "0" ? (<Badge status='critical'>Thanh toán thất bại</Badge>) : (<Badge status='success'>Đã thanh toán</Badge>))
+                                                    }
+                                                </p>
                                             </TableCell>
                                             <TableCell>
                                                 <p>

@@ -1,7 +1,8 @@
-import { Banner, Button, ButtonGroup, Checkbox, FormLayout, LegacyCard, Modal, Page, TextField, Thumbnail, ContextualSaveBar } from '@shopify/polaris'
+import { Banner, Button, ButtonGroup, Checkbox, FormLayout, LegacyCard, Modal, Page, TextField, Thumbnail, ContextualSaveBar, Avatar } from '@shopify/polaris'
 import axios from 'axios';
 import React, { useCallback, useState, useEffect, ChangeEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {ProfileMajor} from "@shopify/polaris-icons";
 
 interface ManualInfo {
     discountName: string,
@@ -28,12 +29,11 @@ const CreateDiscount = () => {
         expiredDate: "",
         quantity: "0"
     })
-    const [productTitle, setProductTitle] = useState("");
     const [customerTitle, setCustomerTitle] = useState("");
     const [active, setActive] = useState(false);
-    const [products, setProducts] = useState([])
-    const [idProductSelected, setIdProductSelected] = useState<number[]>([]);
-    const [productSelected, setProductSelected] = useState([]);
+    const [customers, setCustomers] = useState([])
+    const [idCustomerSelected, setIdCustomerSelected] = useState<number[]>([]);
+    const [customerSelected, setCustomerSelected] = useState([]);
 
 
     const handleChangeManualInfoNameDiscount = (value: string) =>{
@@ -54,19 +54,19 @@ const CreateDiscount = () => {
     }
 
     const handleChange = useCallback(() => setActive(!active), [active]);
-    const fetchProduct = useCallback(async () =>{
-        if(productTitle !== ""){
-            const response = await axios.get(`http://localhost:4000/api/product/get-product-by-name?name=${productTitle}`)
+    const fetchDiscount = useCallback(async () =>{
+        if(customerTitle !== ""){
+            const response = await axios.get(`http://localhost:4000/api/user/get-user-by-name?name=${customerTitle}`)
             if(response.data.success){
-                setProducts(response.data.data)
+                setCustomers(response.data.data)
             }
         }else{
-            const response = await axios.get(`http://localhost:4000/api/product/get-all-product`)
+            const response = await axios.get(`http://localhost:4000/api/user/get-all-user`)
             if(response.data.success){
-                setProducts(response.data.data)
+                setCustomers(response.data.data)
             }
         }
-    },[productTitle])
+    },[customerTitle])
 
     const getDiscount = useCallback(async() =>{
         const response = await axios.get(`http://localhost:4000/api/discount/get-discount-by-id?id=${id}`);
@@ -81,16 +81,16 @@ const CreateDiscount = () => {
                 minimumPrice: response.data.data.minimumPrice,
                 quantity: response.data.data.quantity
             }))
-            if(response.data.data.products !== null){
-                setProductSelected(response.data.data.products)
-                setIdProductSelected(response.data.data.products.map((item: any) => item.id));
+            if(response.data.data.users !== null){
+                setCustomerSelected(response.data.data.users)
+                setIdCustomerSelected(response.data.data.users.map((item: any) => item.id));
             }
         }
     },[id])
 
     useEffect(() => {
-        fetchProduct().then()
-    }, [productTitle])
+        fetchDiscount().then()
+    }, [customerTitle])
     
 
     const handleFirstButtonClick = useCallback(() => {
@@ -103,45 +103,46 @@ const CreateDiscount = () => {
         setManualInfo((pre) =>({...pre,discountType: false}));
       }, [manualInfo.discountType]);
 
-    const handleChangeSelectedProduct = (checked: boolean, id: string) =>{
+    const handleChangeSelectedcustomer = (checked: boolean, id: string) =>{
         let ids = Number(id);
         
-        if(idProductSelected.indexOf(ids) !== -1) {
-            const selected = idProductSelected.filter((product) => product !== ids)
-            setIdProductSelected(selected);
-            setProductSelected((pre) => pre.filter((item: any) => item.id !== ids) );
+        if(idCustomerSelected.indexOf(ids) !== -1) {
+            const selected = idCustomerSelected.filter((customer) => customer !== ids)
+            setIdCustomerSelected(selected);
+            setCustomerSelected((pre) => pre.filter((item: any) => item.id !== ids) );
         }else{
-            setIdProductSelected((pre) => ([...pre, ids]))    
-            const selected = products.filter((item: any) => item.id === ids)
-            setProductSelected((pre) => [...pre, selected[0]])        
+            setIdCustomerSelected((pre) => ([...pre, ids]))    
+            const selected = customers.filter((item: any) => item.id === ids)
+            setCustomerSelected((pre) => [...pre, selected[0]])        
         }
     }
 
-    const handleDismisProductSelected = (id: any) =>{
+    const handleDismisCustomerSelected = (id: any) =>{
         const ids = Number(id);
-        const selected = idProductSelected.filter((product) => product !== ids)
-        setIdProductSelected(selected);
-        setProductSelected((pre) => pre.filter((item: any) => item.id !== ids) );
+        const selected = idCustomerSelected.filter((customer) => customer !== ids)
+        setIdCustomerSelected(selected);
+        setCustomerSelected((pre) => pre.filter((item: any) => item.id !== ids) );
     }
     
     const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) =>{
         setManualInfo((pre) => ({...pre, expiredDate: e.target.value}))
     }
 
-    const productMarkup = products && products.map((product:{id: number, image: string, name: string}) =>{
-        return <div key={product.id} className='product-search-list'>
+    const customerMarkup = customers && customers.map((customer:{id: number, firstName: string, lastName: string, phoneNumber: string}) =>{
+        return <div key={customer.id} className='customer-search-list'>
             <Checkbox 
-                key={product.id}
-                id={product.id+ ""}
-                label={<Thumbnail source={product.image} alt='product-image' />} 
-                checked={idProductSelected.includes(product.id)} 
-                onChange={handleChangeSelectedProduct}
+                key={customer.id}
+                id={customer.id+ ""}
+                label={<Avatar customer />} 
+                checked={idCustomerSelected.includes(customer.id)} 
+                onChange={handleChangeSelectedcustomer}
             />
-            {product.name}
+            {customer.firstName + " " + customer.lastName}
+            {customer.phoneNumber}
         </div>;
     })
 
-    console.log(idProductSelected);
+    console.log(idCustomerSelected);
     
 
     const handleSave = async () =>{
@@ -150,16 +151,20 @@ const CreateDiscount = () => {
             id: id,
             value: manualInfo.discountValue,
             name: manualInfo.discountName,
-            productIds: idProductSelected,
+            customerIds: idCustomerSelected,
             expiredDate: manualInfo.expiredDate,
             maximumDiscount: manualInfo.maximumDiscount,
             minimumPrice: manualInfo.minimumPrice,
             quantity: manualInfo.quantity,
-            customerIds: [],
+            productIds: [],
         })
 
         if(saveReq.data.success){
-            alert("Thêm mới mã giảm giá thành công")
+            if(id === "create"){
+                alert("Thêm mới mã giảm giá thành công")
+            }else{
+                alert("Cập nhật mã giảm giá thành công")
+            }
             navigate("/discount")
         }
     }
@@ -255,20 +260,20 @@ const CreateDiscount = () => {
                 <LegacyCard.Section>
                     <FormLayout>
                         <TextField 
-                            placeholder='Tên sản phẩm'
+                            placeholder='Tên khách hàng'
                             autoComplete='false'
-                            value={productTitle}
+                            value={customerTitle}
                             onFocus={handleChange}
-                            onChange={(value) =>setProductTitle(value)}
+                            onChange={(value) =>setCustomerTitle(value)}
                         />
                     </FormLayout>
                     {
-                        productSelected.length > 0 ? productSelected.map((product: any) => ( 
-                        <div style={{paddingTop: '12px'}} key={product.id}>
-                        <Banner key={product.id} onDismiss={() => handleDismisProductSelected(product.id)} hideIcon>
+                        customerSelected.length > 0 ? customerSelected.map((customer: any) => ( 
+                        <div style={{paddingTop: '12px'}} key={customer.id}>
+                        <Banner key={customer.id} onDismiss={() => handleDismisCustomerSelected(customer.id)} hideIcon>
                             <div style={{ display: "flex", alignItems: "center" }}>
-                                <Thumbnail source={product.image} alt='product-image' />
-                                <span style={{ marginLeft: "12px" }}>{product.name}</span>
+                                <Avatar customer size='medium'/>
+                                <span style={{ marginLeft: "12px" }}>{customer.firstName + " " + customer.lastName} - {customer.phoneNumber}</span>
                             </div>
                         </Banner>
                     </div>
@@ -277,15 +282,15 @@ const CreateDiscount = () => {
                     <Modal
                         open={active}
                         onClose={handleChange}
-                        title="Danh sách sản phẩm"
+                        title="Danh sách khách hàng"
                         primaryAction={{
                             content: 'Thêm',
                             onAction: handleChange,
                         }}
                     >
                         <Modal.Section>
-                        <TextField placeholder='Tên product' autoComplete='false' autoFocus value={productTitle} onChange={(value) => setProductTitle(value)}/>
-                        {productMarkup}
+                        <TextField placeholder='Tên khách hàng' autoComplete='false' autoFocus value={customerTitle} onChange={(value) => setCustomerTitle(value)}/>
+                        {customerMarkup}
                         </Modal.Section>
                     </Modal>
                 </LegacyCard.Section>

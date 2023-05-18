@@ -84,11 +84,11 @@ const CustomerDetail = () => {
     const id = urlSplit[urlSplit.length - 1];
     const [order, setOrder] = useState<orderData[] | []>([]);
     const [user, setUser] = useState<User | null>(null);
+    const [showAll, setShowAll] = useState(false);
 
     useEffect(() =>{
         const fetchOrder = async () =>{
             const response = await axios.get<any, orderResponse>(`http://localhost:4000/api/order/get-order-by-customer?id=${id}`)
-            console.log(response);
             const user = await axios.get<any, UserRes>(`http://localhost:4000/api/user/get-user-by-id?id=${id}`)
             if(response.data.success){
                 setOrder(response.data.data);
@@ -100,9 +100,6 @@ const CustomerDetail = () => {
         fetchOrder()
     },[])
 
-    console.log(order);
-    
-
     return (
         <Page>
             <Grid>
@@ -110,70 +107,135 @@ const CustomerDetail = () => {
                     <LegacyCard 
                         title="Đơn hàng gần đây nhất"
                         primaryFooterAction={{
-                            content: "Xem tất cả đơn hàng",
-                            onAction: () =>{alert()},
+                            content: showAll ? "Ẩn đơn hàng" : "xem tất cả đơn hàng",
+                            onAction: () =>{setShowAll(pre => !pre)},
                         }}
                     >
                         <LegacyCard.Section>
                         {
-                            order.length > 0 && order[0].products.map((product) =>(
-                                <div 
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        marginBottom: "20px"
-                                    }} 
-                                    key={product.id}
-                                >
-                                    <div
+                            order.length > 0 && !showAll && order[0].products.map((product) =>(
+                                    <div 
                                         style={{
                                             display: "flex",
                                             justifyContent: "space-between",
-                                            alignItems: "center"
+                                            alignItems: "center",
+                                            marginBottom: "20px"
                                         }} 
+                                        key={product.id}
                                     >
-                                        <Thumbnail source={product.image} alt={product.name} size='large'/>
-                                        <span style={{
-                                            marginLeft: '20px'
-                                        }}>
-                                            <Link url={`/product/${product.id}`}>
-                                                {product.name}
-                                            </Link>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center"
+                                            }} 
+                                        >
+                                            <Thumbnail source={product.image} alt={product.name} size='large'/>
+                                            <span style={{
+                                                marginLeft: '20px'
+                                            }}>
+                                                <Link url={`/product/${product.id}`}>
+                                                    {product.name}
+                                                </Link>
+                                                {
+                                                    order[0].variant.map((variantProduct) =>(
+                                                        variantProduct.productId == product.id ? variantProduct.variantInfo.id.map((variant, index) =>(
+                                                            product.variants.map((item) =>{
+                                                                if(item.id === variant){
+                                                                    return (
+                                                                        <Box key={item.id}>{item.title}: {item.value[variantProduct.variantInfo.index[index]]}</Box> 
+                                                                    )
+                                                                }
+                                                            })
+                                                        )) : ""
+                                                    ))
+                                                }
+                                            </span>
+                                            
+                                        </div>
+                                        <div>
                                             {
-                                                order[0].variant.map((variantProduct) =>(
-                                                    variantProduct.productId == product.id ? variantProduct.variantInfo.id.map((variant, index) =>(
-                                                        product.variants.map((item) =>{
-                                                            if(item.id === variant){
-                                                                return (
-                                                                    <Box key={item.id}>{item.title}: {item.value[variantProduct.variantInfo.index[index]]}</Box> 
-                                                                )
-                                                            }
-                                                        })
-                                                    )) : ""
+                                                order[0].totalPricePerProduct.map((item, index) =>(
+                                                    item.productId === product.id ? `${priceFormat.format(item.totalPrice)} x ${order[0].quantityPerProduct[index].quantity}` : ""
                                                 ))
                                             }
-                                        </span>
-                                        
+                                        </div>
+                                        <div>
+                                            {
+                                                order[0].totalPricePerProduct.map((item, index) =>(
+                                                    item.productId === product.id ? priceFormat.format(item.totalPrice * order[0].quantityPerProduct[index].quantity) : ""
+                                                ))
+                                            }
+                                        </div>
                                     </div>
-                                    <div>
-                                        {
-                                            order[0].totalPricePerProduct.map((item, index) =>(
-                                                item.productId === product.id ? `${priceFormat.format(item.totalPrice)} x ${order[0].quantityPerProduct[index].quantity}` : ""
-                                            ))
-                                        }
+                                 
+                                ))
+                            }
+                        </LegacyCard.Section>  
+                            { order.length > 0 && showAll && 
+                                    order.map((order) =>(
+                                        <LegacyCard.Section>
+                                            {
+                                        order.products.map((product) =>(
+                                        <div 
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            marginBottom: "20px"
+                                        }} 
+                                        key={product.id}
+                                    >
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center"
+                                            }} 
+                                        >
+                                            <Thumbnail source={product.image} alt={product.name} size='large'/>
+                                            <span style={{
+                                                marginLeft: '20px'
+                                            }}>
+                                                <Link url={`/product/${product.id}`}>
+                                                    {product.name}
+                                                </Link>
+                                                {
+                                                    order.variant.map((variantProduct) =>(
+                                                        variantProduct.productId == product.id ? variantProduct.variantInfo.id.map((variant, index) =>(
+                                                            product.variants.map((item) =>{
+                                                                if(item.id === variant){
+                                                                    return (
+                                                                        <Box key={item.id}>{item.title}: {item.value[variantProduct.variantInfo.index[index]]}</Box> 
+                                                                    )
+                                                                }
+                                                            })
+                                                        )) : ""
+                                                    ))
+                                                }
+                                            </span>
+                                            
+                                        </div>
+                                        <div>
+                                            {
+                                                order.totalPricePerProduct.map((item, index) =>(
+                                                    item.productId === product.id ? `${priceFormat.format(item.totalPrice)} x ${order.quantityPerProduct[index].quantity}` : ""
+                                                ))
+                                            }
+                                        </div>
+                                        <div>
+                                            {
+                                                order.totalPricePerProduct.map((item, index) =>(
+                                                    item.productId === product.id ? priceFormat.format(item.totalPrice * order.quantityPerProduct[index].quantity) : ""
+                                                ))
+                                            }
+                                        </div>
                                     </div>
-                                    <div>
-                                        {
-                                            order[0].totalPricePerProduct.map((item, index) =>(
-                                                item.productId === product.id ? priceFormat.format(item.totalPrice * order[0].quantityPerProduct[index].quantity) : ""
-                                            ))
-                                        }
-                                    </div>
-                                </div>
-                            ))
-                        }
-                        </LegacyCard.Section>
+                                    ))
+                                    }
+                                    </LegacyCard.Section>
+                                ))
+                            }
                     </LegacyCard>
                 </Grid.Cell>
                 <Grid.Cell columnSpan={{ xl: 5, xs: 6 }}>
